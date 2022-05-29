@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Static Template</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
+    <style>
+      @-webkit-keyframes loading-ring-animation {
+        0% {
+          -webkit-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        to {
+          -webkit-transform: rotate(1turn);
+          transform: rotate(1turn);
+        }
+      }
+      @keyframes loading-ring-animation {
+        0% {
+          -webkit-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        to {
+          -webkit-transform: rotate(1turn);
+          transform: rotate(1turn);
+        }
+      }
+      #bmi-calculator-app {
+        position: relative;
+        margin: 3rem auto;
+        background: #f7f7f7;
+        border: 2px solid #ededed;
+        padding: 1rem;
+        border-radius: 3px !important;
+        padding: 1.25rem;
+      }
+      #bmi-calculator-app.loading .loading-overlay {
+        opacity: 1 !important;
+        z-index: 50 !important;
+      }
+      #bmi-calculator-app .loading-overlay {
+        position: absolute;
+        background-color: hsla(0, 0%, 66%, 0.369);
+        border-radius: 20px;
+        height: 100%;
+        left: 0;
+        opacity: 0;
+        top: 0;
+        transition: all 0.3s ease-in-out;
+        width: 100%;
+      }
+      .app-body-container {
+        position: relative;
+        z-index: 30;
+      }
+      .alert-orange {
+        border-color: #e1c38e;
+        background: #ffd994;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="position-relative" id="bmi-calculator-app">
+      <div class="position-absolute loading-overlay">
+        <div class="loading-ring">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+      <div class="container app-body-container position-relative">
+        <header class="row align-items-center border-bottom">
+          <div class="col col-12 col-md-6">
+            <h1>BMI Calculator</h1>
+          </div>
+          <div class="col col-12 col-md-6 text-end">
+            <img
+              src="https://filipiknow.net/wp-content/uploads/2022/05/filipiknow-mascot-transbg.png"
+              class="filipiknow-mascot"
+              alt="Filipiknow Mascot"
+              width="120"
+              height="auto"
+              class=""
+            />
+          </div>
+        </header>
+        <main class="row">
+          <div class="col col-12 py-3 flex-wrap">
+            <h6 class="me-3 mb-0">Select System</h6>
+            <p class="">
+              <i class="" id="system-note"
+                >Note: Enter centimeter (cm) and kilograms (kg).
+              </i>
+            </p>
+            <div class="form-check">
+              <label for="metric" class="form-check-label">
+                Metric
+              </label>
+              <input
+                checked
+                type="radio"
+                name="csystem"
+                value="metric"
+                id="metric"
+                class="form-check-input"
+              />
+            </div>
+            <div class="form-check">
+              <label for="imperial" class="form-check-label">
+                US Imperial
+              </label>
+              <input
+                type="radio"
+                name="csystem"
+                value="imperial"
+                id="imperial"
+                class="form-check-input"
+              />
+            </div>
+          </div>
+          <div class="col col-12">
+            <div class="form-group py-2">
+              <h6>Height <span id="height-unit">(cm)</span>:</h6>
+              <input
+                class="form-control"
+                type="number"
+                name="height"
+                data-format=""
+                id="height"
+                value="0"
+                placeholder="Height in cm"
+              />
+            </div>
+
+            <div class="form-group py-2">
+              <h6>Weight <span id="weight-unit">(kg)</span>:</h6>
+              <input
+                class="form-control"
+                type="number"
+                name="weight"
+                data-format=""
+                value="0"
+                id="weight"
+                placeholder="Weight in kg"
+              />
+            </div>
+
+            <div class="form-group py-2">
+              <button class="btn btn-primary" id="calculate">Calculate</button>
+              <button class="inline btn btn-outline-secondary ms-2" id="reset">
+                Reset
+              </button>
+            </div>
+          </div>
+          <div class="col-12 col">
+            <div id="output-string"></div>
+          </div>
+        </main>
+      </div>
+    </section>
+  </body>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    (function ($) {
+      const $system = $("input[name=csystem]");
+      const $calculateButton = $("#calculate");
+      const $height = $("#height");
+      const $weight = $("#weight");
+      const $outputString = $("#output-string");
+      const $resetButton = $("#reset");
+      const $systemNote = $("#system-note");
+      const heightCtrl = $("#height-control");
+      const weightCtrl = $("#weight-control");
+
+      const calculate = function () {
+        resetOutputString();
+
+        const system = $("input[name=csystem]:checked").val();
+        const height = parseFloat($height.val());
+        const weight = parseFloat($weight.val());
+
+        if (system === "metric") {
+          result = doMetric(height, weight);
+        }
+
+        if (system === "imperial") {
+          result = doImperial(height, weight);
+        }
+        $outputString.html(result);
+      };
+
+      const reset = function () {
+        resetHeight();
+        resetWeight();
+        resetOutputString();
+      };
+
+      const resetHeight = function () {
+        $height.val(0);
+      };
+
+      const resetWeight = function () {
+        $weight.val(0);
+      };
+
+      const resetOutputString = function () {
+        $outputString.html("");
+      };
+
+      const doImperial = (height = 0, weight = 0) => {
+        let calculation = ((703 * weight) / Math.pow(height, 2)).toFixed(1);
+        let status = evaluateNumber(calculation);
+        console.log("metric: ", calculation, status);
+        return status;
+      };
+
+      const doMetric = (height = 0, weight = 0) => {
+        let calculation = (weight / Math.pow(height / 100, 2)).toFixed(1);
+        let status = evaluateNumber(calculation);
+        console.log("metric: ", calculation, status);
+        return status;
+      };
+
+      const evaluateNumber = (result) => {
+        let status = "";
+        let statusCode = "alert-warning";
+        let resultText = "";
+        if (result > 0 && result < 18.5) {
+          status = "as an <strong>underweight</strong>";
+        } else if (result >= 18.5 && result <= 24.9) {
+          status = "as a <strong>normal</strong>";
+          statusCode = "alert-success";
+        } else if (result >= 25 && result <= 29.9) {
+          status = "as an <strong>overweight</strong>";
+          statusCode = "alert-orange";
+        } else if (result >= 30 && result <= 40) {
+          status = "as an <strong>obese Type 1 (obese)</strong>";
+          statusCode = "alert-danger";
+        } else if (result >= 40.1 && result <= 50) {
+          status = "as an <strong>obese Type 2 (morbid obese)</strong>";
+          statusCode = "alert-danger";
+        } else if (result > 50) {
+          status = "as an <strong>obese Type 3 (super obese)</strong>";
+          statusCode = "alert-danger";
+        } else {
+          status = "Invalid numbers, please try again.";
+          statusCode = "alert-danger";
+          resultText = `<div class='alert ${statusCode}'>${status}</div>`;
+          return resultText;
+        }
+
+        resultText = `<div class='alert ${statusCode}'>Your BMI Score is <strong>${result}</strong>, which would be categorized ${status} BMI.</div>`;
+        return resultText;
+      };
+
+      const handleChange = () => {
+        let emperialNote = `Note: Enter inches (in) and pounds (lbs).`;
+        let metricNote = `Note: Enter centimeter (cm) and kilograms (kg).`;
+        const system = $("input[name=csystem]:checked").val();
+        const heightUnit = $("#height-unit");
+        const weightUnit = $("#weight-unit");
+        const height = parseFloat($height.val());
+        const weight = parseFloat($weight.val());
+        let inches = 0;
+        let cm = 0;
+        let kg = 0;
+        let lbs = 0;
+
+        resetOutputString();
+
+        if (height > 0 && weight > 0) {
+          console.log("convert this value");
+
+          if (system === "metric") {
+            console.log("inches to cm & lbs to kg");
+            cm = height / 0.3937;
+            kg = weight / 2.2046;
+            $height.val(cm.toFixed(0));
+            $weight.val(kg.toFixed(0));
+          }
+
+          if (system === "imperial") {
+            console.log("cm to inches & kg to lbs");
+            lbs = weight * 2.2046;
+            inches = height * 0.3937;
+            $height.val(inches.toFixed(1));
+            $weight.val(lbs.toFixed(1));
+          }
+        } else {
+          resetHeight();
+          resetWeight();
+        }
+
+        if (system === "metric") {
+          heightUnit.text("(cm)");
+          weightUnit.text("(kg)");
+          heightCtrl.attr("placeholder", "Height in cm");
+          weightCtrl.attr("placeholder", "Weight in kg");
+          $systemNote.text(metricNote);
+        }
+
+        if (system === "imperial") {
+          heightUnit.text("(in)");
+          weightUnit.text("(lbs)");
+          heightCtrl.attr("placeholder", "Height in inches");
+          weightCtrl.attr("placeholder", "Weight in lbs");
+          $systemNote.text(emperialNote);
+        }
+      };
+
+      $calculateButton.on("click", calculate);
+      $("body").on("click", "#reset", reset);
+      $system.on("change", handleChange);
+    })(jQuery);
+  </script>
+</html>
