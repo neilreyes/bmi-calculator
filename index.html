@@ -126,17 +126,16 @@
       </div>
       <div class="container app-body-container position-relative">
         <header class="row align-items-center border-bottom">
-          <div class="col col-12 col-md-6 text-center text-md-start">
+          <div class="col col-12 col-md-6">
             <h1>BMI Calculator</h1>
           </div>
-          <div class="col col-12 col-md-6 text-center text-md-end">
+          <div class="col col-12 col-md-6 text-end">
             <img
               src="https://filipiknow.net/wp-content/uploads/2022/05/filipiknow-mascot-transbg.png"
               class="filipiknow-mascot"
               alt="Filipiknow Mascot"
               width="120"
               height="auto"
-              class=""
             />
           </div>
         </header>
@@ -145,40 +144,38 @@
             <h6 class="me-3 mb-0">Select System</h6>
             <p class="">
               <i class="" id="system-note"
-                >Note: Enter centimeter (cm) and kilograms (kg).
+                >Note: Enter meters (m) and kilograms (kg).
               </i>
             </p>
-            <div class="d-flex">
-              <div class="form-check">
-                <label for="metric" class="form-check-label">
-                  Metric
-                </label>
-                <input
-                  checked
-                  type="radio"
-                  name="csystem"
-                  value="metric"
-                  id="metric"
-                  class="form-check-input"
-                />
-              </div>
-              <div class="form-check ms-3">
-                <label for="imperial" class="form-check-label">
-                  US Imperial
-                </label>
-                <input
-                  type="radio"
-                  name="csystem"
-                  value="imperial"
-                  id="imperial"
-                  class="form-check-input"
-                />
-              </div>
+            <div class="form-check">
+              <label for="metric" class="form-check-label">
+                Metric
+              </label>
+              <input
+                checked=""
+                type="radio"
+                name="csystem"
+                value="metric"
+                id="metric"
+                class="form-check-input"
+              />
+            </div>
+            <div class="form-check">
+              <label for="imperial" class="form-check-label">
+                US Imperial
+              </label>
+              <input
+                type="radio"
+                name="csystem"
+                value="imperial"
+                id="imperial"
+                class="form-check-input"
+              />
             </div>
           </div>
           <div class="col col-12">
             <div class="form-group py-2">
-              <h6>Height <span id="height-unit">(cm)</span>:</h6>
+              <h6>Height <span id="height-unit">(m)</span>:</h6>
               <input
                 class="form-control"
                 type="number"
@@ -186,7 +183,7 @@
                 data-format=""
                 id="height"
                 value="0"
-                placeholder="Height in cm"
+                placeholder="Height in meters"
               />
             </div>
 
@@ -210,7 +207,7 @@
               </button>
             </div>
           </div>
-          <div class="col-12 col mt-2">
+          <div class="col-12 col">
             <div id="output-string"></div>
           </div>
         </main>
@@ -220,7 +217,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
       (function ($) {
-        const $calculatorContainer = $("#bmi-calculator-app");
         const $system = $("input[name=csystem]");
         const $calculateButton = $("#calculate");
         const $height = $("#height");
@@ -232,30 +228,26 @@
         const weightCtrl = $("#weight-control");
 
         const calculate = function () {
-          setLoader(() => {
-            resetOutputString();
+          resetOutputString();
 
-            const system = $("input[name=csystem]:checked").val();
-            const height = parseFloat($height.val());
-            const weight = parseFloat($weight.val());
+          const system = $("input[name=csystem]:checked").val();
+          const height = parseFloat($height.val());
+          const weight = parseFloat($weight.val());
 
-            if (system === "metric") {
-              result = doMetric(height, weight);
-            }
+          if (system === "metric") {
+            result = doMetric(height, weight);
+          }
 
-            if (system === "imperial") {
-              result = doImperial(height, weight);
-            }
-            $outputString.html(result);
-          });
+          if (system === "imperial") {
+            result = doImperial(height, weight);
+          }
+          $outputString.html(result);
         };
 
         const reset = function () {
-          setLoader(() => {
-            resetHeight();
-            resetWeight();
-            resetOutputString();
-          });
+          resetHeight();
+          resetWeight();
+          resetOutputString();
         };
 
         const resetHeight = function () {
@@ -278,7 +270,7 @@
         };
 
         const doMetric = (height = 0, weight = 0) => {
-          let calculation = (weight / Math.pow(height / 100, 2)).toFixed(1);
+          let calculation = (weight / Math.pow(height, 2)).toFixed(1);
           let status = evaluateNumber(calculation);
           console.log("metric: ", calculation, status);
           return status;
@@ -317,67 +309,58 @@
         };
 
         const handleChange = () => {
-          setLoader(() => {
-            let emperialNote = `Note: Enter inches (in) and pounds (lbs).`;
-            let metricNote = `Note: Enter centimeter (cm) and kilograms (kg).`;
-            const system = $("input[name=csystem]:checked").val();
-            const heightUnit = $("#height-unit");
-            const weightUnit = $("#weight-unit");
-            const height = parseFloat($height.val());
-            const weight = parseFloat($weight.val());
-            let inches = 0;
-            let cm = 0;
-            let kg = 0;
-            let lbs = 0;
+          let emperialNote = `Note: Enter inches (in) and pounds (lbs).`;
+          let metricNote = `Note: Enter meters (m) and kilograms (kg).`;
+          const system = $("input[name=csystem]:checked").val();
+          const heightUnit = $("#height-unit");
+          const weightUnit = $("#weight-unit");
+          const height = parseFloat($height.val());
+          const weight = parseFloat($weight.val());
+          let inches = 0;
+          let meters = 0;
+          let kg = 0;
+          let lbs = 0;
 
-            resetOutputString();
+          resetOutputString();
 
-            if (height > 0 && weight > 0) {
-              if (system === "metric") {
-                console.log("inches to cm & lbs to kg");
-                cm = height / 0.3937;
-                kg = weight / 2.2046;
-                $height.val(cm.toFixed(0));
-                $weight.val(kg.toFixed(0));
-              }
-
-              if (system === "imperial") {
-                console.log("cm to inches & kg to lbs");
-                lbs = weight * 2.2046;
-                inches = height * 0.3937;
-                $height.val(inches.toFixed(1));
-                $weight.val(lbs.toFixed(1));
-              }
-            } else {
-              resetHeight();
-              resetWeight();
-            }
+          if (height > 0 && weight > 0) {
+            console.log("convert this value");
 
             if (system === "metric") {
-              heightUnit.text("(cm)");
-              weightUnit.text("(kg)");
-              heightCtrl.attr("placeholder", "Height in cm");
-              weightCtrl.attr("placeholder", "Weight in kg");
-              $systemNote.text(metricNote);
+              console.log("inches to meters & lbs to kg");
+              meters = height / 39.37;
+              kg = weight / 2.2046;
+              $height.val(meters.toFixed(2));
+              $weight.val(kg.toFixed(0));
             }
 
             if (system === "imperial") {
-              heightUnit.text("(in)");
-              weightUnit.text("(lbs)");
-              heightCtrl.attr("placeholder", "Height in inches");
-              weightCtrl.attr("placeholder", "Weight in lbs");
-              $systemNote.text(emperialNote);
+              console.log("meters to inches & kg to lbs");
+              lbs = weight * 2.2046;
+              inches = height * 39.37;
+              $height.val(inches.toFixed(2));
+              $weight.val(lbs.toFixed(1));
             }
-          });
-        };
+          } else {
+            resetHeight();
+            resetWeight();
+          }
 
-        const setLoader = (fn) => {
-          $calculatorContainer.addClass("loading");
+          if (system === "metric") {
+            heightUnit.text("(meters)");
+            weightUnit.text("(kg)");
+            heightCtrl.attr("placeholder", "Height in(meters");
+            weightCtrl.attr("placeholder", "Weight in kg");
+            $systemNote.text(metricNote);
+          }
 
-          setTimeout(() => {
-            $calculatorContainer.removeClass("loading");
-            fn();
-          }, 1000);
+          if (system === "imperial") {
+            heightUnit.text("(in)");
+            weightUnit.text("(lbs)");
+            heightCtrl.attr("placeholder", "Height in inches");
+            weightCtrl.attr("placeholder", "Weight in lbs");
+            $systemNote.text(emperialNote);
+          }
         };
 
         $calculateButton.on("click", calculate);
